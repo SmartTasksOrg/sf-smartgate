@@ -1,0 +1,1068 @@
+{
+  "description": "policies that every engine must accept (valid: true) or reject",
+  "cases": [
+    {
+      "name": "default policy",
+      "valid": true,
+      "policy": {
+        "schema": "smartgate.policy/v1",
+        "cost_bands": [
+          {
+            "max_usd": 1000,
+            "score": 2
+          },
+          {
+            "max_usd": 5000,
+            "score": 5
+          },
+          {
+            "max_usd": 20000,
+            "score": 8
+          },
+          {
+            "max_usd": null,
+            "score": 10
+          }
+        ],
+        "action_floors": {
+          "read": 0,
+          "api_call": 0,
+          "file_write": 2,
+          "message_send": 3,
+          "db_write": 3,
+          "code_exec": 6,
+          "delete": 6
+        },
+        "default_floor": 4,
+        "irreversible_bonus": 2,
+        "levels": [
+          {
+            "name": "low",
+            "max_score": 3,
+            "friction": "allow"
+          },
+          {
+            "name": "medium",
+            "max_score": 6,
+            "friction": "prompt"
+          },
+          {
+            "name": "high",
+            "max_score": 10,
+            "friction": "block"
+          }
+        ],
+        "cascade": {
+          "window_ms": 5000,
+          "max_actions": 3,
+          "max_cumulative_risk": 7,
+          "escalate_to": "allow"
+        },
+        "low_confidence": {
+          "below_permille": 300,
+          "escalate_to": "prompt"
+        },
+        "approval": {
+          "timeout_ms": 300000,
+          "on_timeout": "reject"
+        },
+        "fallback": "allow"
+      }
+    },
+    {
+      "name": "wrong schema",
+      "valid": false,
+      "policy": {
+        "schema": "smartgate.policy/v2",
+        "cost_bands": [
+          {
+            "max_usd": 1000,
+            "score": 2
+          },
+          {
+            "max_usd": 5000,
+            "score": 5
+          },
+          {
+            "max_usd": 20000,
+            "score": 8
+          },
+          {
+            "max_usd": null,
+            "score": 10
+          }
+        ],
+        "action_floors": {
+          "read": 0,
+          "api_call": 0,
+          "file_write": 2,
+          "message_send": 3,
+          "db_write": 3,
+          "code_exec": 6,
+          "delete": 6
+        },
+        "default_floor": 4,
+        "irreversible_bonus": 2,
+        "levels": [
+          {
+            "name": "low",
+            "max_score": 3,
+            "friction": "allow"
+          },
+          {
+            "name": "medium",
+            "max_score": 6,
+            "friction": "prompt"
+          },
+          {
+            "name": "high",
+            "max_score": 10,
+            "friction": "block"
+          }
+        ],
+        "cascade": {
+          "window_ms": 5000,
+          "max_actions": 3,
+          "max_cumulative_risk": 7,
+          "escalate_to": "allow"
+        },
+        "low_confidence": {
+          "below_permille": 300,
+          "escalate_to": "prompt"
+        },
+        "approval": {
+          "timeout_ms": 300000,
+          "on_timeout": "reject"
+        },
+        "fallback": "allow"
+      }
+    },
+    {
+      "name": "empty cost bands",
+      "valid": false,
+      "policy": {
+        "schema": "smartgate.policy/v1",
+        "cost_bands": [],
+        "action_floors": {
+          "read": 0,
+          "api_call": 0,
+          "file_write": 2,
+          "message_send": 3,
+          "db_write": 3,
+          "code_exec": 6,
+          "delete": 6
+        },
+        "default_floor": 4,
+        "irreversible_bonus": 2,
+        "levels": [
+          {
+            "name": "low",
+            "max_score": 3,
+            "friction": "allow"
+          },
+          {
+            "name": "medium",
+            "max_score": 6,
+            "friction": "prompt"
+          },
+          {
+            "name": "high",
+            "max_score": 10,
+            "friction": "block"
+          }
+        ],
+        "cascade": {
+          "window_ms": 5000,
+          "max_actions": 3,
+          "max_cumulative_risk": 7,
+          "escalate_to": "allow"
+        },
+        "low_confidence": {
+          "below_permille": 300,
+          "escalate_to": "prompt"
+        },
+        "approval": {
+          "timeout_ms": 300000,
+          "on_timeout": "reject"
+        },
+        "fallback": "allow"
+      }
+    },
+    {
+      "name": "last band not open",
+      "valid": false,
+      "policy": {
+        "schema": "smartgate.policy/v1",
+        "cost_bands": [
+          {
+            "max_usd": 1000,
+            "score": 2
+          },
+          {
+            "max_usd": 5000,
+            "score": 5
+          },
+          {
+            "max_usd": 20000,
+            "score": 8
+          },
+          {
+            "max_usd": 1000000000.0,
+            "score": 10
+          }
+        ],
+        "action_floors": {
+          "read": 0,
+          "api_call": 0,
+          "file_write": 2,
+          "message_send": 3,
+          "db_write": 3,
+          "code_exec": 6,
+          "delete": 6
+        },
+        "default_floor": 4,
+        "irreversible_bonus": 2,
+        "levels": [
+          {
+            "name": "low",
+            "max_score": 3,
+            "friction": "allow"
+          },
+          {
+            "name": "medium",
+            "max_score": 6,
+            "friction": "prompt"
+          },
+          {
+            "name": "high",
+            "max_score": 10,
+            "friction": "block"
+          }
+        ],
+        "cascade": {
+          "window_ms": 5000,
+          "max_actions": 3,
+          "max_cumulative_risk": 7,
+          "escalate_to": "allow"
+        },
+        "low_confidence": {
+          "below_permille": 300,
+          "escalate_to": "prompt"
+        },
+        "approval": {
+          "timeout_ms": 300000,
+          "on_timeout": "reject"
+        },
+        "fallback": "allow"
+      }
+    },
+    {
+      "name": "bands not increasing",
+      "valid": false,
+      "policy": {
+        "schema": "smartgate.policy/v1",
+        "cost_bands": [
+          {
+            "max_usd": 1000,
+            "score": 2
+          },
+          {
+            "max_usd": 500,
+            "score": 5
+          },
+          {
+            "max_usd": 20000,
+            "score": 8
+          },
+          {
+            "max_usd": null,
+            "score": 10
+          }
+        ],
+        "action_floors": {
+          "read": 0,
+          "api_call": 0,
+          "file_write": 2,
+          "message_send": 3,
+          "db_write": 3,
+          "code_exec": 6,
+          "delete": 6
+        },
+        "default_floor": 4,
+        "irreversible_bonus": 2,
+        "levels": [
+          {
+            "name": "low",
+            "max_score": 3,
+            "friction": "allow"
+          },
+          {
+            "name": "medium",
+            "max_score": 6,
+            "friction": "prompt"
+          },
+          {
+            "name": "high",
+            "max_score": 10,
+            "friction": "block"
+          }
+        ],
+        "cascade": {
+          "window_ms": 5000,
+          "max_actions": 3,
+          "max_cumulative_risk": 7,
+          "escalate_to": "allow"
+        },
+        "low_confidence": {
+          "below_permille": 300,
+          "escalate_to": "prompt"
+        },
+        "approval": {
+          "timeout_ms": 300000,
+          "on_timeout": "reject"
+        },
+        "fallback": "allow"
+      }
+    },
+    {
+      "name": "score above 10",
+      "valid": false,
+      "policy": {
+        "schema": "smartgate.policy/v1",
+        "cost_bands": [
+          {
+            "max_usd": 1000,
+            "score": 11
+          },
+          {
+            "max_usd": 5000,
+            "score": 5
+          },
+          {
+            "max_usd": 20000,
+            "score": 8
+          },
+          {
+            "max_usd": null,
+            "score": 10
+          }
+        ],
+        "action_floors": {
+          "read": 0,
+          "api_call": 0,
+          "file_write": 2,
+          "message_send": 3,
+          "db_write": 3,
+          "code_exec": 6,
+          "delete": 6
+        },
+        "default_floor": 4,
+        "irreversible_bonus": 2,
+        "levels": [
+          {
+            "name": "low",
+            "max_score": 3,
+            "friction": "allow"
+          },
+          {
+            "name": "medium",
+            "max_score": 6,
+            "friction": "prompt"
+          },
+          {
+            "name": "high",
+            "max_score": 10,
+            "friction": "block"
+          }
+        ],
+        "cascade": {
+          "window_ms": 5000,
+          "max_actions": 3,
+          "max_cumulative_risk": 7,
+          "escalate_to": "allow"
+        },
+        "low_confidence": {
+          "below_permille": 300,
+          "escalate_to": "prompt"
+        },
+        "approval": {
+          "timeout_ms": 300000,
+          "on_timeout": "reject"
+        },
+        "fallback": "allow"
+      }
+    },
+    {
+      "name": "score not an integer",
+      "valid": false,
+      "policy": {
+        "schema": "smartgate.policy/v1",
+        "cost_bands": [
+          {
+            "max_usd": 1000,
+            "score": 2.5
+          },
+          {
+            "max_usd": 5000,
+            "score": 5
+          },
+          {
+            "max_usd": 20000,
+            "score": 8
+          },
+          {
+            "max_usd": null,
+            "score": 10
+          }
+        ],
+        "action_floors": {
+          "read": 0,
+          "api_call": 0,
+          "file_write": 2,
+          "message_send": 3,
+          "db_write": 3,
+          "code_exec": 6,
+          "delete": 6
+        },
+        "default_floor": 4,
+        "irreversible_bonus": 2,
+        "levels": [
+          {
+            "name": "low",
+            "max_score": 3,
+            "friction": "allow"
+          },
+          {
+            "name": "medium",
+            "max_score": 6,
+            "friction": "prompt"
+          },
+          {
+            "name": "high",
+            "max_score": 10,
+            "friction": "block"
+          }
+        ],
+        "cascade": {
+          "window_ms": 5000,
+          "max_actions": 3,
+          "max_cumulative_risk": 7,
+          "escalate_to": "allow"
+        },
+        "low_confidence": {
+          "below_permille": 300,
+          "escalate_to": "prompt"
+        },
+        "approval": {
+          "timeout_ms": 300000,
+          "on_timeout": "reject"
+        },
+        "fallback": "allow"
+      }
+    },
+    {
+      "name": "floor out of range",
+      "valid": false,
+      "policy": {
+        "schema": "smartgate.policy/v1",
+        "cost_bands": [
+          {
+            "max_usd": 1000,
+            "score": 2
+          },
+          {
+            "max_usd": 5000,
+            "score": 5
+          },
+          {
+            "max_usd": 20000,
+            "score": 8
+          },
+          {
+            "max_usd": null,
+            "score": 10
+          }
+        ],
+        "action_floors": {
+          "read": -1,
+          "api_call": 0,
+          "file_write": 2,
+          "message_send": 3,
+          "db_write": 3,
+          "code_exec": 6,
+          "delete": 6
+        },
+        "default_floor": 4,
+        "irreversible_bonus": 2,
+        "levels": [
+          {
+            "name": "low",
+            "max_score": 3,
+            "friction": "allow"
+          },
+          {
+            "name": "medium",
+            "max_score": 6,
+            "friction": "prompt"
+          },
+          {
+            "name": "high",
+            "max_score": 10,
+            "friction": "block"
+          }
+        ],
+        "cascade": {
+          "window_ms": 5000,
+          "max_actions": 3,
+          "max_cumulative_risk": 7,
+          "escalate_to": "allow"
+        },
+        "low_confidence": {
+          "below_permille": 300,
+          "escalate_to": "prompt"
+        },
+        "approval": {
+          "timeout_ms": 300000,
+          "on_timeout": "reject"
+        },
+        "fallback": "allow"
+      }
+    },
+    {
+      "name": "levels not ending at 10",
+      "valid": false,
+      "policy": {
+        "schema": "smartgate.policy/v1",
+        "cost_bands": [
+          {
+            "max_usd": 1000,
+            "score": 2
+          },
+          {
+            "max_usd": 5000,
+            "score": 5
+          },
+          {
+            "max_usd": 20000,
+            "score": 8
+          },
+          {
+            "max_usd": null,
+            "score": 10
+          }
+        ],
+        "action_floors": {
+          "read": 0,
+          "api_call": 0,
+          "file_write": 2,
+          "message_send": 3,
+          "db_write": 3,
+          "code_exec": 6,
+          "delete": 6
+        },
+        "default_floor": 4,
+        "irreversible_bonus": 2,
+        "levels": [
+          {
+            "name": "low",
+            "max_score": 3,
+            "friction": "allow"
+          },
+          {
+            "name": "medium",
+            "max_score": 6,
+            "friction": "prompt"
+          },
+          {
+            "name": "high",
+            "max_score": 9,
+            "friction": "block"
+          }
+        ],
+        "cascade": {
+          "window_ms": 5000,
+          "max_actions": 3,
+          "max_cumulative_risk": 7,
+          "escalate_to": "allow"
+        },
+        "low_confidence": {
+          "below_permille": 300,
+          "escalate_to": "prompt"
+        },
+        "approval": {
+          "timeout_ms": 300000,
+          "on_timeout": "reject"
+        },
+        "fallback": "allow"
+      }
+    },
+    {
+      "name": "unknown friction",
+      "valid": false,
+      "policy": {
+        "schema": "smartgate.policy/v1",
+        "cost_bands": [
+          {
+            "max_usd": 1000,
+            "score": 2
+          },
+          {
+            "max_usd": 5000,
+            "score": 5
+          },
+          {
+            "max_usd": 20000,
+            "score": 8
+          },
+          {
+            "max_usd": null,
+            "score": 10
+          }
+        ],
+        "action_floors": {
+          "read": 0,
+          "api_call": 0,
+          "file_write": 2,
+          "message_send": 3,
+          "db_write": 3,
+          "code_exec": 6,
+          "delete": 6
+        },
+        "default_floor": 4,
+        "irreversible_bonus": 2,
+        "levels": [
+          {
+            "name": "low",
+            "max_score": 3,
+            "friction": "warn"
+          },
+          {
+            "name": "medium",
+            "max_score": 6,
+            "friction": "prompt"
+          },
+          {
+            "name": "high",
+            "max_score": 10,
+            "friction": "block"
+          }
+        ],
+        "cascade": {
+          "window_ms": 5000,
+          "max_actions": 3,
+          "max_cumulative_risk": 7,
+          "escalate_to": "allow"
+        },
+        "low_confidence": {
+          "below_permille": 300,
+          "escalate_to": "prompt"
+        },
+        "approval": {
+          "timeout_ms": 300000,
+          "on_timeout": "reject"
+        },
+        "fallback": "allow"
+      }
+    },
+    {
+      "name": "duplicate level name",
+      "valid": false,
+      "policy": {
+        "schema": "smartgate.policy/v1",
+        "cost_bands": [
+          {
+            "max_usd": 1000,
+            "score": 2
+          },
+          {
+            "max_usd": 5000,
+            "score": 5
+          },
+          {
+            "max_usd": 20000,
+            "score": 8
+          },
+          {
+            "max_usd": null,
+            "score": 10
+          }
+        ],
+        "action_floors": {
+          "read": 0,
+          "api_call": 0,
+          "file_write": 2,
+          "message_send": 3,
+          "db_write": 3,
+          "code_exec": 6,
+          "delete": 6
+        },
+        "default_floor": 4,
+        "irreversible_bonus": 2,
+        "levels": [
+          {
+            "name": "low",
+            "max_score": 3,
+            "friction": "allow"
+          },
+          {
+            "name": "low",
+            "max_score": 6,
+            "friction": "prompt"
+          },
+          {
+            "name": "high",
+            "max_score": 10,
+            "friction": "block"
+          }
+        ],
+        "cascade": {
+          "window_ms": 5000,
+          "max_actions": 3,
+          "max_cumulative_risk": 7,
+          "escalate_to": "allow"
+        },
+        "low_confidence": {
+          "below_permille": 300,
+          "escalate_to": "prompt"
+        },
+        "approval": {
+          "timeout_ms": 300000,
+          "on_timeout": "reject"
+        },
+        "fallback": "allow"
+      }
+    },
+    {
+      "name": "cascade window zero",
+      "valid": false,
+      "policy": {
+        "schema": "smartgate.policy/v1",
+        "cost_bands": [
+          {
+            "max_usd": 1000,
+            "score": 2
+          },
+          {
+            "max_usd": 5000,
+            "score": 5
+          },
+          {
+            "max_usd": 20000,
+            "score": 8
+          },
+          {
+            "max_usd": null,
+            "score": 10
+          }
+        ],
+        "action_floors": {
+          "read": 0,
+          "api_call": 0,
+          "file_write": 2,
+          "message_send": 3,
+          "db_write": 3,
+          "code_exec": 6,
+          "delete": 6
+        },
+        "default_floor": 4,
+        "irreversible_bonus": 2,
+        "levels": [
+          {
+            "name": "low",
+            "max_score": 3,
+            "friction": "allow"
+          },
+          {
+            "name": "medium",
+            "max_score": 6,
+            "friction": "prompt"
+          },
+          {
+            "name": "high",
+            "max_score": 10,
+            "friction": "block"
+          }
+        ],
+        "cascade": {
+          "window_ms": 0,
+          "max_actions": 3,
+          "max_cumulative_risk": 7,
+          "escalate_to": "allow"
+        },
+        "low_confidence": {
+          "below_permille": 300,
+          "escalate_to": "prompt"
+        },
+        "approval": {
+          "timeout_ms": 300000,
+          "on_timeout": "reject"
+        },
+        "fallback": "allow"
+      }
+    },
+    {
+      "name": "confidence threshold above 1000",
+      "valid": false,
+      "policy": {
+        "schema": "smartgate.policy/v1",
+        "cost_bands": [
+          {
+            "max_usd": 1000,
+            "score": 2
+          },
+          {
+            "max_usd": 5000,
+            "score": 5
+          },
+          {
+            "max_usd": 20000,
+            "score": 8
+          },
+          {
+            "max_usd": null,
+            "score": 10
+          }
+        ],
+        "action_floors": {
+          "read": 0,
+          "api_call": 0,
+          "file_write": 2,
+          "message_send": 3,
+          "db_write": 3,
+          "code_exec": 6,
+          "delete": 6
+        },
+        "default_floor": 4,
+        "irreversible_bonus": 2,
+        "levels": [
+          {
+            "name": "low",
+            "max_score": 3,
+            "friction": "allow"
+          },
+          {
+            "name": "medium",
+            "max_score": 6,
+            "friction": "prompt"
+          },
+          {
+            "name": "high",
+            "max_score": 10,
+            "friction": "block"
+          }
+        ],
+        "cascade": {
+          "window_ms": 5000,
+          "max_actions": 3,
+          "max_cumulative_risk": 7,
+          "escalate_to": "allow"
+        },
+        "low_confidence": {
+          "below_permille": 1001,
+          "escalate_to": "prompt"
+        },
+        "approval": {
+          "timeout_ms": 300000,
+          "on_timeout": "reject"
+        },
+        "fallback": "allow"
+      }
+    },
+    {
+      "name": "unknown fallback",
+      "valid": false,
+      "policy": {
+        "schema": "smartgate.policy/v1",
+        "cost_bands": [
+          {
+            "max_usd": 1000,
+            "score": 2
+          },
+          {
+            "max_usd": 5000,
+            "score": 5
+          },
+          {
+            "max_usd": 20000,
+            "score": 8
+          },
+          {
+            "max_usd": null,
+            "score": 10
+          }
+        ],
+        "action_floors": {
+          "read": 0,
+          "api_call": 0,
+          "file_write": 2,
+          "message_send": 3,
+          "db_write": 3,
+          "code_exec": 6,
+          "delete": 6
+        },
+        "default_floor": 4,
+        "irreversible_bonus": 2,
+        "levels": [
+          {
+            "name": "low",
+            "max_score": 3,
+            "friction": "allow"
+          },
+          {
+            "name": "medium",
+            "max_score": 6,
+            "friction": "prompt"
+          },
+          {
+            "name": "high",
+            "max_score": 10,
+            "friction": "block"
+          }
+        ],
+        "cascade": {
+          "window_ms": 5000,
+          "max_actions": 3,
+          "max_cumulative_risk": 7,
+          "escalate_to": "allow"
+        },
+        "low_confidence": {
+          "below_permille": 300,
+          "escalate_to": "prompt"
+        },
+        "approval": {
+          "timeout_ms": 300000,
+          "on_timeout": "reject"
+        },
+        "fallback": "maybe"
+      }
+    },
+    {
+      "name": "approval timeout zero",
+      "valid": false,
+      "policy": {
+        "schema": "smartgate.policy/v1",
+        "cost_bands": [
+          {
+            "max_usd": 1000,
+            "score": 2
+          },
+          {
+            "max_usd": 5000,
+            "score": 5
+          },
+          {
+            "max_usd": 20000,
+            "score": 8
+          },
+          {
+            "max_usd": null,
+            "score": 10
+          }
+        ],
+        "action_floors": {
+          "read": 0,
+          "api_call": 0,
+          "file_write": 2,
+          "message_send": 3,
+          "db_write": 3,
+          "code_exec": 6,
+          "delete": 6
+        },
+        "default_floor": 4,
+        "irreversible_bonus": 2,
+        "levels": [
+          {
+            "name": "low",
+            "max_score": 3,
+            "friction": "allow"
+          },
+          {
+            "name": "medium",
+            "max_score": 6,
+            "friction": "prompt"
+          },
+          {
+            "name": "high",
+            "max_score": 10,
+            "friction": "block"
+          }
+        ],
+        "cascade": {
+          "window_ms": 5000,
+          "max_actions": 3,
+          "max_cumulative_risk": 7,
+          "escalate_to": "allow"
+        },
+        "low_confidence": {
+          "below_permille": 300,
+          "escalate_to": "prompt"
+        },
+        "approval": {
+          "timeout_ms": 0,
+          "on_timeout": "reject"
+        },
+        "fallback": "allow"
+      }
+    },
+    {
+      "name": "cascade and low_confidence switched off",
+      "valid": true,
+      "policy": {
+        "schema": "smartgate.policy/v1",
+        "cost_bands": [
+          {
+            "max_usd": 1000,
+            "score": 2
+          },
+          {
+            "max_usd": 5000,
+            "score": 5
+          },
+          {
+            "max_usd": 20000,
+            "score": 8
+          },
+          {
+            "max_usd": null,
+            "score": 10
+          }
+        ],
+        "action_floors": {
+          "read": 0,
+          "api_call": 0,
+          "file_write": 2,
+          "message_send": 3,
+          "db_write": 3,
+          "code_exec": 6,
+          "delete": 6
+        },
+        "default_floor": 4,
+        "irreversible_bonus": 2,
+        "levels": [
+          {
+            "name": "low",
+            "max_score": 3,
+            "friction": "allow"
+          },
+          {
+            "name": "medium",
+            "max_score": 6,
+            "friction": "prompt"
+          },
+          {
+            "name": "high",
+            "max_score": 10,
+            "friction": "block"
+          }
+        ],
+        "cascade": null,
+        "low_confidence": null,
+        "approval": {
+          "timeout_ms": 300000,
+          "on_timeout": "reject"
+        },
+        "fallback": "allow"
+      }
+    }
+  ]
+}

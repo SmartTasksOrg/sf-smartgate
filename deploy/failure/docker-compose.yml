@@ -1,0 +1,30 @@
+# Failure test: two SmartGate servers share one Redis; k6 runs the load test while run.sh stops
+# Redis for 20 s and starts it again. It shows what agents see during a Redis outage (HTTP 500 from
+# the servers: the clients raise an error and the actions do not run; the fallback applies only when a
+# server itself cannot be reached) and how lock waits recover. Not run in CI.
+#   SMARTGATE_AGENT_TOKEN=... SMARTGATE_OPERATOR_TOKEN=... deploy/failure/run.sh
+name: smartgate-failure
+
+services:
+  redis:
+    image: redis:7.2.5
+  gate-a:
+    build: { context: ../.., dockerfile: Dockerfile }
+    entrypoint: ["sf-smartgate", "serve", "--host", "0.0.0.0", "--port", "8711", "--kill-rate", "100000"]
+    environment: &env
+      SMARTGATE_AGENT_TOKEN: ${SMARTGATE_AGENT_TOKEN:?}
+      SMARTGATE_OPERATOR_TOKEN: ${SMARTGATE_OPERATOR_TOKEN:?}
+      SMARTGATE_REDIS_URL: redis://redis:6379/0
+    depends_on: [redis]
+  gate-b:
+    build: { context: ../.., dockerfile: Dockerfile }
+    entrypoint: ["sf-smartgate", "serve", "--host", "0.0.0.0", "--port", "8711", "--kill-rate", "100000"]
+    environment: *env
+    depends_on: [redis]
+  k6:
+    image: grafana/k6:0.52.0
+    profiles: [load]
+    volumes: ["../k6:/scripts:ro", "./out:/out"]
+    environment:
+      SMARTGATE_AGENT_TOKEN: ${SMARTGATE_AGENT_TOKEN:?}
+      SMARTGATE_OPERATOR_TOKEN: ${SMARTGATE_OPERATOR_TOKEN:?}

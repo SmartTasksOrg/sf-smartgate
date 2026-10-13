@@ -1,0 +1,14 @@
+{
+  "name": "sf-smartgate",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SmartGate for Node.js: the decision engine, kill registry and audit chain, and a client for the SmartGate server. Not published on npm; use it from a clone.",
+  "license": "Apache-2.0",
+  "main": "src/index.js",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "test": "node test/conformance.js",
+    "interop": "node test/interop.js"
+  },
+  "repository": { "type": "git", "url": "https://github.com/SmartTasksOrg/sf-smartgate", "directory": "ports/node" }
+}

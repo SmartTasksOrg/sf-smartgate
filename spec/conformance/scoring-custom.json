@@ -1,0 +1,218 @@
+{
+  "description": "one action, fresh engine; a custom policy",
+  "policy": {
+    "schema": "smartgate.policy/v1",
+    "cost_bands": [
+      {
+        "max_usd": 99.5,
+        "score": 0
+      },
+      {
+        "max_usd": 250.25,
+        "score": 3
+      },
+      {
+        "max_usd": null,
+        "score": 9
+      }
+    ],
+    "action_floors": {
+      "read": 0,
+      "email": 1
+    },
+    "default_floor": 7,
+    "irreversible_bonus": 1,
+    "levels": [
+      {
+        "name": "green",
+        "max_score": 1,
+        "friction": "allow"
+      },
+      {
+        "name": "amber",
+        "max_score": 8,
+        "friction": "prompt"
+      },
+      {
+        "name": "red",
+        "max_score": 10,
+        "friction": "block"
+      }
+    ],
+    "cascade": {
+      "window_ms": 5000,
+      "max_actions": 3,
+      "max_cumulative_risk": 7,
+      "escalate_to": "allow"
+    },
+    "low_confidence": null,
+    "approval": {
+      "timeout_ms": 300000,
+      "on_timeout": "reject"
+    },
+    "fallback": "allow"
+  },
+  "cases": [
+    {
+      "name": "read at 99.5",
+      "action": {
+        "action_id": "t1",
+        "agent_id": "agent-a",
+        "action_type": "read",
+        "cost_usd": 99.5
+      },
+      "expect": {
+        "action_id": "t1",
+        "agent_id": "agent-a",
+        "decision": "allow",
+        "score": 0,
+        "level": "green",
+        "reasons": [
+          "GATE-LEVEL-GREEN"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "read at 99.51",
+      "action": {
+        "action_id": "t2",
+        "agent_id": "agent-a",
+        "action_type": "read",
+        "cost_usd": 99.51
+      },
+      "expect": {
+        "action_id": "t2",
+        "agent_id": "agent-a",
+        "decision": "prompt",
+        "score": 3,
+        "level": "amber",
+        "reasons": [
+          "GATE-LEVEL-AMBER"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "email irreversible",
+      "action": {
+        "action_id": "t3",
+        "agent_id": "agent-a",
+        "action_type": "email",
+        "reversible": false
+      },
+      "expect": {
+        "action_id": "t3",
+        "agent_id": "agent-a",
+        "decision": "prompt",
+        "score": 2,
+        "level": "amber",
+        "reasons": [
+          "GATE-LEVEL-AMBER"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "email at 250.25",
+      "action": {
+        "action_id": "t4",
+        "agent_id": "agent-a",
+        "action_type": "email",
+        "cost_usd": 250.25
+      },
+      "expect": {
+        "action_id": "t4",
+        "agent_id": "agent-a",
+        "decision": "prompt",
+        "score": 3,
+        "level": "amber",
+        "reasons": [
+          "GATE-LEVEL-AMBER"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "unlisted type",
+      "action": {
+        "action_id": "t5",
+        "agent_id": "agent-a",
+        "action_type": "other"
+      },
+      "expect": {
+        "action_id": "t5",
+        "agent_id": "agent-a",
+        "decision": "prompt",
+        "score": 7,
+        "level": "amber",
+        "reasons": [
+          "GATE-LEVEL-AMBER",
+          "GATE-UNLISTED-TYPE"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "unlisted irreversible",
+      "action": {
+        "action_id": "t6",
+        "agent_id": "agent-a",
+        "action_type": "other",
+        "reversible": false
+      },
+      "expect": {
+        "action_id": "t6",
+        "agent_id": "agent-a",
+        "decision": "prompt",
+        "score": 8,
+        "level": "amber",
+        "reasons": [
+          "GATE-LEVEL-AMBER",
+          "GATE-UNLISTED-TYPE"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "large cost",
+      "action": {
+        "action_id": "t7",
+        "agent_id": "agent-a",
+        "action_type": "read",
+        "cost_usd": 1000000.0
+      },
+      "expect": {
+        "action_id": "t7",
+        "agent_id": "agent-a",
+        "decision": "block",
+        "score": 9,
+        "level": "red",
+        "reasons": [
+          "GATE-LEVEL-RED"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "confidence ignored without low_confidence",
+      "action": {
+        "action_id": "t8",
+        "agent_id": "agent-a",
+        "action_type": "read",
+        "confidence_permille": 0
+      },
+      "expect": {
+        "action_id": "t8",
+        "agent_id": "agent-a",
+        "decision": "allow",
+        "score": 0,
+        "level": "green",
+        "reasons": [
+          "GATE-LEVEL-GREEN"
+        ],
+        "cascade": false
+      }
+    }
+  ]
+}

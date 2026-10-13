@@ -1,0 +1,489 @@
+{
+  "description": "one action, fresh engine; default policy",
+  "policy": "default",
+  "cases": [
+    {
+      "name": "read, no cost",
+      "action": {
+        "action_id": "s1",
+        "agent_id": "agent-a",
+        "action_type": "read"
+      },
+      "expect": {
+        "action_id": "s1",
+        "agent_id": "agent-a",
+        "decision": "allow",
+        "score": 2,
+        "level": "low",
+        "reasons": [
+          "GATE-LEVEL-LOW"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "api call at 1000 USD (band edge)",
+      "action": {
+        "action_id": "s2",
+        "agent_id": "agent-a",
+        "action_type": "api_call",
+        "cost_usd": 1000
+      },
+      "expect": {
+        "action_id": "s2",
+        "agent_id": "agent-a",
+        "decision": "allow",
+        "score": 2,
+        "level": "low",
+        "reasons": [
+          "GATE-LEVEL-LOW"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "api call at 1000.01 USD",
+      "action": {
+        "action_id": "s3",
+        "agent_id": "agent-a",
+        "action_type": "api_call",
+        "cost_usd": 1000.01
+      },
+      "expect": {
+        "action_id": "s3",
+        "agent_id": "agent-a",
+        "decision": "prompt",
+        "score": 5,
+        "level": "medium",
+        "reasons": [
+          "GATE-LEVEL-MEDIUM"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "api call at 5000 USD",
+      "action": {
+        "action_id": "s4",
+        "agent_id": "agent-a",
+        "action_type": "api_call",
+        "cost_usd": 5000
+      },
+      "expect": {
+        "action_id": "s4",
+        "agent_id": "agent-a",
+        "decision": "prompt",
+        "score": 5,
+        "level": "medium",
+        "reasons": [
+          "GATE-LEVEL-MEDIUM"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "api call at 5000.5 USD",
+      "action": {
+        "action_id": "s5",
+        "agent_id": "agent-a",
+        "action_type": "api_call",
+        "cost_usd": 5000.5
+      },
+      "expect": {
+        "action_id": "s5",
+        "agent_id": "agent-a",
+        "decision": "block",
+        "score": 8,
+        "level": "high",
+        "reasons": [
+          "GATE-LEVEL-HIGH"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "api call at 20000 USD",
+      "action": {
+        "action_id": "s6",
+        "agent_id": "agent-a",
+        "action_type": "api_call",
+        "cost_usd": 20000
+      },
+      "expect": {
+        "action_id": "s6",
+        "agent_id": "agent-a",
+        "decision": "block",
+        "score": 8,
+        "level": "high",
+        "reasons": [
+          "GATE-LEVEL-HIGH"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "api call at 20001 USD",
+      "action": {
+        "action_id": "s7",
+        "agent_id": "agent-a",
+        "action_type": "api_call",
+        "cost_usd": 20001
+      },
+      "expect": {
+        "action_id": "s7",
+        "agent_id": "agent-a",
+        "decision": "block",
+        "score": 10,
+        "level": "high",
+        "reasons": [
+          "GATE-LEVEL-HIGH"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "file write floor",
+      "action": {
+        "action_id": "s8",
+        "agent_id": "agent-a",
+        "action_type": "file_write"
+      },
+      "expect": {
+        "action_id": "s8",
+        "agent_id": "agent-a",
+        "decision": "allow",
+        "score": 2,
+        "level": "low",
+        "reasons": [
+          "GATE-LEVEL-LOW"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "message send floor (still low)",
+      "action": {
+        "action_id": "s9",
+        "agent_id": "agent-a",
+        "action_type": "message_send"
+      },
+      "expect": {
+        "action_id": "s9",
+        "agent_id": "agent-a",
+        "decision": "allow",
+        "score": 3,
+        "level": "low",
+        "reasons": [
+          "GATE-LEVEL-LOW"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "db write floor",
+      "action": {
+        "action_id": "s10",
+        "agent_id": "agent-a",
+        "action_type": "db_write"
+      },
+      "expect": {
+        "action_id": "s10",
+        "agent_id": "agent-a",
+        "decision": "allow",
+        "score": 3,
+        "level": "low",
+        "reasons": [
+          "GATE-LEVEL-LOW"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "code exec floor",
+      "action": {
+        "action_id": "s11",
+        "agent_id": "agent-a",
+        "action_type": "code_exec"
+      },
+      "expect": {
+        "action_id": "s11",
+        "agent_id": "agent-a",
+        "decision": "prompt",
+        "score": 6,
+        "level": "medium",
+        "reasons": [
+          "GATE-LEVEL-MEDIUM"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "delete floor",
+      "action": {
+        "action_id": "s12",
+        "agent_id": "agent-a",
+        "action_type": "delete"
+      },
+      "expect": {
+        "action_id": "s12",
+        "agent_id": "agent-a",
+        "decision": "prompt",
+        "score": 6,
+        "level": "medium",
+        "reasons": [
+          "GATE-LEVEL-MEDIUM"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "irreversible delete",
+      "action": {
+        "action_id": "s13",
+        "agent_id": "agent-a",
+        "action_type": "delete",
+        "reversible": false
+      },
+      "expect": {
+        "action_id": "s13",
+        "agent_id": "agent-a",
+        "decision": "block",
+        "score": 8,
+        "level": "high",
+        "reasons": [
+          "GATE-LEVEL-HIGH"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "irreversible message",
+      "action": {
+        "action_id": "s14",
+        "agent_id": "agent-a",
+        "action_type": "message_send",
+        "reversible": false
+      },
+      "expect": {
+        "action_id": "s14",
+        "agent_id": "agent-a",
+        "decision": "prompt",
+        "score": 5,
+        "level": "medium",
+        "reasons": [
+          "GATE-LEVEL-MEDIUM"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "irreversible cheap api call",
+      "action": {
+        "action_id": "s15",
+        "agent_id": "agent-a",
+        "action_type": "api_call",
+        "cost_usd": 900,
+        "reversible": false
+      },
+      "expect": {
+        "action_id": "s15",
+        "agent_id": "agent-a",
+        "decision": "prompt",
+        "score": 4,
+        "level": "medium",
+        "reasons": [
+          "GATE-LEVEL-MEDIUM"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "clamped to 10",
+      "action": {
+        "action_id": "s16",
+        "agent_id": "agent-a",
+        "action_type": "payment",
+        "cost_usd": 50000,
+        "reversible": false
+      },
+      "expect": {
+        "action_id": "s16",
+        "agent_id": "agent-a",
+        "decision": "block",
+        "score": 10,
+        "level": "high",
+        "reasons": [
+          "GATE-LEVEL-HIGH",
+          "GATE-UNLISTED-TYPE"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "unlisted type gets default floor",
+      "action": {
+        "action_id": "s17",
+        "agent_id": "agent-a",
+        "action_type": "launch_job"
+      },
+      "expect": {
+        "action_id": "s17",
+        "agent_id": "agent-a",
+        "decision": "prompt",
+        "score": 4,
+        "level": "medium",
+        "reasons": [
+          "GATE-LEVEL-MEDIUM",
+          "GATE-UNLISTED-TYPE"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "unlisted type with high cost",
+      "action": {
+        "action_id": "s18",
+        "agent_id": "agent-a",
+        "action_type": "wire_transfer",
+        "cost_usd": 12000
+      },
+      "expect": {
+        "action_id": "s18",
+        "agent_id": "agent-a",
+        "decision": "block",
+        "score": 8,
+        "level": "high",
+        "reasons": [
+          "GATE-LEVEL-HIGH",
+          "GATE-UNLISTED-TYPE"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "low confidence 299 permille",
+      "action": {
+        "action_id": "s19",
+        "agent_id": "agent-a",
+        "action_type": "api_call",
+        "confidence_permille": 299
+      },
+      "expect": {
+        "action_id": "s19",
+        "agent_id": "agent-a",
+        "decision": "prompt",
+        "score": 2,
+        "level": "low",
+        "reasons": [
+          "GATE-LEVEL-LOW",
+          "GATE-LOW-CONFIDENCE"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "confidence 300 permille (not low)",
+      "action": {
+        "action_id": "s20",
+        "agent_id": "agent-a",
+        "action_type": "api_call",
+        "confidence_permille": 300
+      },
+      "expect": {
+        "action_id": "s20",
+        "agent_id": "agent-a",
+        "decision": "allow",
+        "score": 2,
+        "level": "low",
+        "reasons": [
+          "GATE-LEVEL-LOW"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "low confidence on a blocked action",
+      "action": {
+        "action_id": "s21",
+        "agent_id": "agent-a",
+        "action_type": "api_call",
+        "cost_usd": 30000,
+        "confidence_permille": 10
+      },
+      "expect": {
+        "action_id": "s21",
+        "agent_id": "agent-a",
+        "decision": "block",
+        "score": 10,
+        "level": "high",
+        "reasons": [
+          "GATE-LEVEL-HIGH",
+          "GATE-LOW-CONFIDENCE"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "explicit reversible true",
+      "action": {
+        "action_id": "s22",
+        "agent_id": "agent-a",
+        "action_type": "code_exec",
+        "reversible": true,
+        "cost_usd": 0
+      },
+      "expect": {
+        "action_id": "s22",
+        "agent_id": "agent-a",
+        "decision": "prompt",
+        "score": 6,
+        "level": "medium",
+        "reasons": [
+          "GATE-LEVEL-MEDIUM"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "integer cost zero",
+      "action": {
+        "action_id": "s23",
+        "agent_id": "agent-a",
+        "action_type": "api_call",
+        "cost_usd": 0
+      },
+      "expect": {
+        "action_id": "s23",
+        "agent_id": "agent-a",
+        "decision": "allow",
+        "score": 2,
+        "level": "low",
+        "reasons": [
+          "GATE-LEVEL-LOW"
+        ],
+        "cascade": false
+      }
+    },
+    {
+      "name": "target is ignored by scoring",
+      "action": {
+        "action_id": "s24",
+        "agent_id": "agent-a",
+        "action_type": "api_call",
+        "cost_usd": 10,
+        "target": "https://example.invalid/x"
+      },
+      "expect": {
+        "action_id": "s24",
+        "agent_id": "agent-a",
+        "decision": "allow",
+        "score": 2,
+        "level": "low",
+        "reasons": [
+          "GATE-LEVEL-LOW"
+        ],
+        "cascade": false
+      }
+    }
+  ]
+}

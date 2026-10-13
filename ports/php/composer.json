@@ -1,0 +1,12 @@
+{
+    "name": "smarttasksorg/sf-smartgate",
+    "description": "SmartGate for PHP: decision engine, kill registry, audit chain and a client for the SmartGate server. Not published on Packagist; use it from a clone.",
+    "type": "library",
+    "license": "Apache-2.0",
+    "require": {
+        "php": ">=8.1",
+        "ext-json": "*",
+        "ext-mbstring": "*"
+    },
+    "autoload": { "files": ["src/SmartGate.php"] }
+}

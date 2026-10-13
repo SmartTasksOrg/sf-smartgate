@@ -1,0 +1,6 @@
+apiVersion: 1
+providers:
+  - name: smartgate
+    folder: SmartGate
+    type: file
+    options: {path: /var/lib/grafana/dashboards}

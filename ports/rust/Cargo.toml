@@ -1,0 +1,14 @@
+[package]
+name = "sf-smartgate"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+description = "SmartGate for Rust: decision engine, kill registry, audit chain and a plain-HTTP client. Not published on crates.io."
+repository = "https://github.com/SmartTasksOrg/sf-smartgate"
+publish = false
+
+[lib]
+name = "smartgate"
+path = "src/lib.rs"
+
+[dependencies]

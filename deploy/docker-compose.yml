@@ -1,0 +1,51 @@
+# SmartGate with shared state in Redis, Prometheus and Grafana.
+#   cp deploy/.env.example deploy/.env    # then put long random tokens in deploy/.env (never commit it)
+#   docker compose -f deploy/docker-compose.yml --env-file deploy/.env up -d --build
+# SmartGate: http://127.0.0.1:8711   Prometheus: http://127.0.0.1:9090   Grafana: http://127.0.0.1:3000
+# Every port is bound to 127.0.0.1; put a TLS proxy in front before exposing anything.
+# Image versions are tags; pin them by digest for production.
+name: smartgate
+
+services:
+  smartgate:
+    build: { context: .., dockerfile: Dockerfile }
+    environment:
+      SMARTGATE_AGENT_TOKEN: ${SMARTGATE_AGENT_TOKEN:?set SMARTGATE_AGENT_TOKEN in deploy/.env}
+      SMARTGATE_OPERATOR_TOKEN: ${SMARTGATE_OPERATOR_TOKEN:?set SMARTGATE_OPERATOR_TOKEN in deploy/.env}
+      SMARTGATE_REDIS_URL: redis://redis:6379/0
+      SMARTGATE_KILL_ALLOW: ${SMARTGATE_KILL_ALLOW:-}
+      SMARTGATE_SLACK_WEBHOOK_URL: ${SMARTGATE_SLACK_WEBHOOK_URL:-}
+      SMARTGATE_SLACK_SIGNING_SECRET: ${SMARTGATE_SLACK_SIGNING_SECRET:-}
+    volumes: [smartgate-audit:/data]
+    ports: ["127.0.0.1:8711:8711"]
+    depends_on: [redis]
+    restart: unless-stopped
+
+  redis:
+    image: redis:7.2.5
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes: [redis-data:/data]
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+    ports: ["127.0.0.1:9090:9090"]
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:11.1.0
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?set GRAFANA_ADMIN_PASSWORD in deploy/.env}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports: ["127.0.0.1:3000:3000"]
+    restart: unless-stopped
+
+volumes:
+  smartgate-audit:
+  redis-data:

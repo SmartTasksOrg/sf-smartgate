@@ -1,0 +1,20 @@
+{
+  "family": "Smart*",
+  "tool": "SmartGate",
+  "version": "0.1.0",
+  "iaiso_section": null,
+  "iaiso_section_note": "not assigned yet: the IAIso section labels are an open decision of the maintainers",
+  "share_mode": "public",
+  "cross_promote": [
+    "SmartDelegate",
+    "SmartRoute",
+    "SmartSeal",
+    "SmartPangolin",
+    "SmartCheck",
+    "SmartFabric"
+  ],
+  "links": {
+    "iaiso": "https://iaiso.org",
+    "cloud": "https://smarttasks.cloud"
+  }
+}

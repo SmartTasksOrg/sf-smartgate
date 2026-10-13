@@ -1,0 +1,167 @@
+openapi: 3.1.0
+info:
+  title: SmartGate server
+  version: 0.1.0
+  description: |
+    Decision friction and a human override for AI agents. Agents call /smartgate/evaluate before an
+    action and report start/complete; people kill actions or halt agents and answer approvals.
+    Agent endpoints need the agent token, operator endpoints the operator token (Bearer).
+    Operator endpoints are rate-limited per source address and can be limited to an IP allowlist.
+    Semantics of scores and decisions: SEMANTICS.md.
+    Every request: at most 64 KiB, with Content-Length (411 for chunked bodies, 413 for bad or large
+    lengths); every error answer closes the connection.
+  license: {name: Apache-2.0}
+servers:
+  - url: http://127.0.0.1:8711
+components:
+  securitySchemes:
+    agent: {type: http, scheme: bearer, description: SMARTGATE_AGENT_TOKEN (the operator token is accepted too)}
+    operator: {type: http, scheme: bearer, description: SMARTGATE_OPERATOR_TOKEN}
+  schemas:
+    Action:
+      type: object
+      required: [action_id, agent_id, action_type]
+      properties:
+        action_id: {type: string, minLength: 1}
+        agent_id: {type: string, minLength: 1}
+        action_type: {type: string, minLength: 1}
+        cost_usd: {type: number, minimum: 0, default: 0}
+        reversible: {type: boolean, default: true}
+        confidence_permille: {type: integer, minimum: 0, maximum: 1000}
+        ts_ms: {type: integer, minimum: 0, description: defaults to the server clock}
+        target: {type: string}
+    Decision:
+      type: object
+      required: [action_id, agent_id, decision, score, level, reasons, cascade]
+      properties:
+        action_id: {type: string}
+        agent_id: {type: string}
+        decision: {enum: [allow, prompt, block]}
+        score: {type: integer, minimum: 0, maximum: 10}
+        level: {type: string}
+        reasons: {type: array, items: {type: string}}
+        cascade: {type: boolean}
+        approval_id: {type: string, description: present when decision is prompt}
+    KillResult:
+      type: object
+      properties:
+        action_id: {type: string}
+        agent_id: {type: string}
+        status: {enum: [killed, completed, halted]}
+        first: {type: boolean, description: true only for the request that changed the state}
+        warning: {type: string}
+        killed: {type: array, items: {type: string}}
+        seen: {type: boolean, description: 'action kills only: false when SmartGate had never registered the action (the kill is kept)'}
+    Approval:
+      type: object
+      properties:
+        approval_id: {type: string}
+        state: {enum: [pending, approved, rejected, timeout]}
+        action_id: {type: string}
+        agent_id: {type: string}
+        score: {type: integer}
+        level: {type: string}
+        reasons: {type: array, items: {type: string}}
+        decided_by: {type: [string, "null"]}
+        expires_at_ms: {type: integer, description: after this the request is in state timeout}
+        on_timeout: {enum: [reject, approve], description: whether a timed-out request lets the action run}
+    Error:
+      type: object
+      properties: {error: {type: string}}
+paths:
+  /healthz:
+    get:
+      summary: Liveness
+      responses: {'200': {description: ok}}
+  /metrics:
+    get:
+      summary: Prometheus metrics (text exposition)
+      responses: {'200': {description: metrics}}
+  /smartgate/score:
+    post:
+      summary: Score an action without recording it
+      security: [{agent: []}]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/Action'}}}}
+      responses:
+        '200': {description: score and level, content: {application/json: {schema: {type: object, properties: {score: {type: integer}, level: {type: string}}}}}}
+        '400': {description: invalid action}
+        '401': {description: missing or wrong token}
+  /smartgate/evaluate:
+    post:
+      summary: Decide an action (registers it, logs the decision, opens an approval when the decision is prompt)
+      security: [{agent: []}]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/Action'}}}}
+      responses:
+        '200': {description: decision, content: {application/json: {schema: {$ref: '#/components/schemas/Decision'}}}}
+        '400': {description: invalid action}
+        '401': {description: missing or wrong token}
+  /smartgate/actions/{action_id}:
+    get:
+      summary: Action state (agents poll this at checkpoints)
+      security: [{agent: []}]
+      parameters: [{name: action_id, in: path, required: true, schema: {type: string}}]
+      responses:
+        '200': {description: state, content: {application/json: {schema: {type: object, properties: {action_id: {type: string}, agent_id: {type: [string, "null"]}, state: {enum: [pending, running, completed, killed]}, reason: {type: string}}}}}}
+        '404': {description: unknown action}
+  /smartgate/actions/{action_id}/start:
+    post:
+      summary: Report that the action starts; started is false when the action was blocked, is not (yet) approved, was killed, or is unknown
+      security: [{agent: []}]
+      parameters: [{name: action_id, in: path, required: true, schema: {type: string}}]
+      responses: {'200': {description: '{action_id, started}'}}
+  /smartgate/actions/{action_id}/complete:
+    post:
+      summary: Report that the action finished
+      security: [{agent: []}]
+      parameters: [{name: action_id, in: path, required: true, schema: {type: string}}]
+      responses: {'200': {description: '{action_id, state}'}}
+  /smartgate/approvals/{approval_id}:
+    get:
+      summary: Approval state
+      security: [{agent: []}]
+      parameters: [{name: approval_id, in: path, required: true, schema: {type: string}}]
+      responses:
+        '200': {description: approval, content: {application/json: {schema: {$ref: '#/components/schemas/Approval'}}}}
+        '404': {description: unknown approval}
+  /smartgate/approvals/{approval_id}/approve:
+    post:
+      summary: Approve (operator)
+      security: [{operator: []}]
+      parameters: [{name: approval_id, in: path, required: true, schema: {type: string}}]
+      responses: {'200': {description: approval}, '403': {description: source address not allowed}, '429': {description: rate limit}}
+  /smartgate/approvals/{approval_id}/reject:
+    post:
+      summary: Reject (operator)
+      security: [{operator: []}]
+      parameters: [{name: approval_id, in: path, required: true, schema: {type: string}}]
+      responses: {'200': {description: approval}, '403': {description: source address not allowed}, '429': {description: rate limit}}
+  /smartgate/kill:
+    post:
+      summary: Kill an action, or halt an agent (idempotent)
+      description: |
+        Give action_id to kill one action (an unknown id is refused when it registers later), or
+        agent_id to halt the agent and kill its unfinished actions (not both). Send X-Request-ID to make
+        a retry of the same request return the first response; another request with an id used in the
+        last 24 hours gets 409.
+      security: [{operator: []}]
+      parameters: [{name: X-Request-ID, in: header, required: false, schema: {type: string}}]
+      requestBody:
+        required: true
+        content: {application/json: {schema: {type: object, properties: {action_id: {type: string}, agent_id: {type: string}, reason: {type: string, maxLength: 500}}}}}
+      responses:
+        '200': {description: result, content: {application/json: {schema: {$ref: '#/components/schemas/KillResult'}}}}
+        '400': {description: neither or both of action_id and agent_id}
+        '409': {description: X-Request-ID already used for a different request}
+        '401': {description: missing or wrong token}
+        '403': {description: source address not allowed}
+        '429': {description: rate limit}
+  /smartgate/agents/{agent_id}/release:
+    post:
+      summary: Release a halted agent (operator)
+      security: [{operator: []}]
+      parameters: [{name: agent_id, in: path, required: true, schema: {type: string}}]
+      responses: {'200': {description: '{agent_id, status, first}'}}
+  /slack/actions:
+    post:
+      summary: Slack interactivity (Approve / Reject / Kill buttons); requires a valid Slack signature
+      responses: {'200': {description: handled}, '401': {description: bad or old signature}}

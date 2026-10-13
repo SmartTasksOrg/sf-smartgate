@@ -1,0 +1,140 @@
+{
+  "description": "canonical JSON (spec/SEMANTICS.md): the exact text and the SHA-256 of its UTF-8 bytes",
+  "cases": [
+    {
+      "name": "empty object",
+      "value": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "name": "empty array",
+      "value": [],
+      "canonical": "[]",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "name": "null",
+      "value": null,
+      "canonical": "null",
+      "sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b"
+    },
+    {
+      "name": "true",
+      "value": true,
+      "canonical": "true",
+      "sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b"
+    },
+    {
+      "name": "false",
+      "value": false,
+      "canonical": "false",
+      "sha256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa"
+    },
+    {
+      "name": "zero",
+      "value": 0,
+      "canonical": "0",
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "name": "negative",
+      "value": -42,
+      "canonical": "-42",
+      "sha256": "fec80006df0542549b4cbaafb8987eee00bb49bca396eefe9ac8be5b5928e8f6"
+    },
+    {
+      "name": "max safe integer",
+      "value": 9007199254740991,
+      "canonical": "9007199254740991",
+      "sha256": "f40b423c2dd95ff2b2f027e22208f438cf7242862e5e746860e697308c9add26"
+    },
+    {
+      "name": "min safe integer",
+      "value": -9007199254740991,
+      "canonical": "-9007199254740991",
+      "sha256": "4c933a456bb8f2e9894b2d0b26480439cd72d52fb8a27cbf8fd7f323f22c7815"
+    },
+    {
+      "name": "sorted keys",
+      "value": {
+        "b": 1,
+        "a": 2,
+        "C": 3,
+        "_": 4,
+        "aa": 5
+      },
+      "canonical": "{\"C\":3,\"_\":4,\"a\":2,\"aa\":5,\"b\":1}",
+      "sha256": "54805e0c52fd9397a31a117d3729ca51957a51ebd244bed3ec03c8911754883d"
+    },
+    {
+      "name": "nested",
+      "value": {
+        "z": [
+          3,
+          {
+            "y": null,
+            "x": [
+              true,
+              false
+            ]
+          }
+        ],
+        "a": {
+          "d": "e"
+        }
+      },
+      "canonical": "{\"a\":{\"d\":\"e\"},\"z\":[3,{\"x\":[true,false],\"y\":null}]}",
+      "sha256": "24982fd7c5bebf92c311a721cd819dd6ee037729aa77ba79c28d7401c19112a9"
+    },
+    {
+      "name": "quote and backslash",
+      "value": "say \"hi\" \\ bye",
+      "canonical": "\"say \\\"hi\\\" \\\\ bye\"",
+      "sha256": "05dabad52a6671eb821b166e6cbdea0b6eb96809823b532504f47eb8b7292607"
+    },
+    {
+      "name": "short escapes",
+      "value": "a\nb\rc\td\be\ff",
+      "canonical": "\"a\\nb\\rc\\td\\be\\ff\"",
+      "sha256": "4392f0d2ec582b06c3b370385f2d4bdfbbc14caf35804534c7fd863e7fbf8de0"
+    },
+    {
+      "name": "other control characters",
+      "value": "x\u0001y\u001fz\u0000",
+      "canonical": "\"x\\u0001y\\u001fz\\u0000\"",
+      "sha256": "eb210188a19f0447daef937df99a2747f75b71bb84fa6f754a7a6652881e7bd2"
+    },
+    {
+      "name": "not escaped",
+      "value": "/ < > & '     ",
+      "canonical": "\"/ < > & '     \"",
+      "sha256": "8d407bcecb939b210dba91bf785dbacab8821e00be71b2031e26d613fabf5f7b"
+    },
+    {
+      "name": "non-ASCII",
+      "value": "café · 東京 · 🚀",
+      "canonical": "\"café · 東京 · 🚀\"",
+      "sha256": "827bc39e20c64e4e1860914039180a6ef982fddce562520c31147becec35ce61"
+    },
+    {
+      "name": "string with keys",
+      "value": {
+        "k": "v",
+        "list": [
+          "a",
+          "b"
+        ],
+        "n": 1
+      },
+      "canonical": "{\"k\":\"v\",\"list\":[\"a\",\"b\"],\"n\":1}",
+      "sha256": "1b33b500ac18f631d437bda60c5a145fee470b1f089dd34ab6a84215efc82a11"
+    },
+    {
+      "name": "empty string",
+      "value": "",
+      "canonical": "\"\"",
+      "sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    }
+  ]
+}

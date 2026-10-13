@@ -1,0 +1,42 @@
+# Alert rules for the council's targets. Thresholds are the council's; tune them to your traffic.
+groups:
+  - name: smartgate
+    rules:
+      - alert: SmartGateDown
+        # while the server is down, clients use their fallback (default: allow, so nothing is gated)
+        expr: up{job="smartgate"} == 0
+        for: 30s
+        labels: {severity: critical}
+        annotations: {summary: "SmartGate is not answering; agents are running on their fallback."}
+      - alert: SmartGateDecisionLatencyHigh
+        expr: histogram_quantile(0.95, sum(rate(smartgate_decision_latency_ms_bucket[5m])) by (le)) > 50
+        for: 5m
+        labels: {severity: critical}
+        annotations: {summary: "95th percentile decision latency above 50 ms."}
+      - alert: SmartGateLowImpactFrictionHigh
+        expr: |
+          sum(rate(smartgate_decisions_total{level="low", decision!="allow"}[15m]))
+            / sum(rate(smartgate_decisions_total{level="low"}[15m])) > 0.10
+        for: 15m
+        labels: {severity: info}
+        annotations: {summary: "More than 10% of low-impact actions get friction (cascade or low confidence)."}
+      - alert: SmartGateFalsePositivePromptsHigh
+        expr: |
+          sum(rate(smartgate_prompts_score_below_3_total[1h]))
+            / sum(rate(smartgate_decisions_total{decision="prompt"}[1h])) > 0.05
+        for: 1h
+        labels: {severity: warning}
+        annotations: {summary: "More than 5% of prompts are for actions scored below 3."}
+      - alert: SmartGateTimeToOverrideSlow
+        expr: histogram_quantile(0.95, sum(rate(smartgate_time_to_override_ms_bucket[15m])) by (le)) > 1000
+        for: 5m
+        labels: {severity: warning}
+        annotations: {summary: "Kills take more than 1 s to reach the action (95th percentile)."}
+      - alert: SmartGateRedisLockContention
+        # more than 5% of lock acquisitions waited longer than 10 ms
+        expr: |
+          (sum(rate(redis_lock_wait_seconds_count[5m])) - sum(rate(redis_lock_wait_seconds_bucket{le="0.01"}[5m])))
+            / sum(rate(redis_lock_wait_seconds_count[5m])) > 0.05
+        for: 5m
+        labels: {severity: warning}
+        annotations: {summary: "More than 5% of Redis lock waits exceed 10 ms."}

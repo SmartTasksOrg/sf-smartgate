@@ -1,0 +1,300 @@
+{
+  "description": "audit chains: record = fields + seq, ts_ms, event, prev; hash = sha256(canonical(record))",
+  "chains": [
+    {
+      "name": "three events",
+      "events": [
+        {
+          "event": "decision",
+          "ts_ms": 1700000000000,
+          "fields": {
+            "action_id": "a1",
+            "agent_id": "bot",
+            "decision": "prompt",
+            "score": 5,
+            "level": "medium",
+            "reasons": [
+              "GATE-LEVEL-MEDIUM"
+            ],
+            "cascade": false,
+            "target": null
+          }
+        },
+        {
+          "event": "approval",
+          "ts_ms": 1700000001000,
+          "fields": {
+            "approval_id": "ap1",
+            "action_id": "a1",
+            "outcome": "approved",
+            "by": "slack:U123"
+          }
+        },
+        {
+          "event": "kill",
+          "ts_ms": 1700000002000,
+          "fields": {
+            "action_id": "a1",
+            "status": "killed",
+            "first": true,
+            "reason": "arrêt «urgent» \n2",
+            "by": "operator"
+          }
+        }
+      ],
+      "hashes": [
+        "5aa6b2c49eee5103efc77ddd46e22b10c2e9c963d56a230330a7b603b78b3bae",
+        "69cb79c9ad7c7d8db39b7aee19903c048844d18336fb14b6305e48eda6115b7b",
+        "204b1b7f4dbf2df09d0093982694d31a71742712e703fb2c5125db3cfb1e6823"
+      ]
+    },
+    {
+      "name": "one event",
+      "events": [
+        {
+          "event": "agent_halt",
+          "ts_ms": 0,
+          "fields": {
+            "agent_id": "bot",
+            "killed": [
+              "x",
+              "y"
+            ],
+            "first": true,
+            "reason": "",
+            "by": ""
+          }
+        }
+      ],
+      "hashes": [
+        "98ecf1a0f1ce3492caa23db8457050c9a2e6b53dec232c4205c812acd870b676"
+      ]
+    },
+    {
+      "name": "empty",
+      "events": [],
+      "hashes": []
+    }
+  ],
+  "tampered": [
+    {
+      "name": "field edited",
+      "records": [
+        {
+          "action_id": "a1",
+          "agent_id": "bot",
+          "decision": "prompt",
+          "score": 5,
+          "level": "medium",
+          "reasons": [
+            "GATE-LEVEL-MEDIUM"
+          ],
+          "cascade": false,
+          "target": null,
+          "seq": 0,
+          "ts_ms": 1700000000000,
+          "event": "decision",
+          "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+          "hash": "5aa6b2c49eee5103efc77ddd46e22b10c2e9c963d56a230330a7b603b78b3bae"
+        },
+        {
+          "approval_id": "ap1",
+          "action_id": "a1",
+          "outcome": "rejected",
+          "by": "slack:U123",
+          "seq": 1,
+          "ts_ms": 1700000001000,
+          "event": "approval",
+          "prev": "5aa6b2c49eee5103efc77ddd46e22b10c2e9c963d56a230330a7b603b78b3bae",
+          "hash": "69cb79c9ad7c7d8db39b7aee19903c048844d18336fb14b6305e48eda6115b7b"
+        },
+        {
+          "action_id": "a1",
+          "status": "killed",
+          "first": true,
+          "reason": "arrêt «urgent» \n2",
+          "by": "operator",
+          "seq": 2,
+          "ts_ms": 1700000002000,
+          "event": "kill",
+          "prev": "69cb79c9ad7c7d8db39b7aee19903c048844d18336fb14b6305e48eda6115b7b",
+          "hash": "204b1b7f4dbf2df09d0093982694d31a71742712e703fb2c5125db3cfb1e6823"
+        }
+      ],
+      "bad_index": 1
+    },
+    {
+      "name": "records swapped",
+      "records": [
+        {
+          "approval_id": "ap1",
+          "action_id": "a1",
+          "outcome": "approved",
+          "by": "slack:U123",
+          "seq": 1,
+          "ts_ms": 1700000001000,
+          "event": "approval",
+          "prev": "5aa6b2c49eee5103efc77ddd46e22b10c2e9c963d56a230330a7b603b78b3bae",
+          "hash": "69cb79c9ad7c7d8db39b7aee19903c048844d18336fb14b6305e48eda6115b7b"
+        },
+        {
+          "action_id": "a1",
+          "agent_id": "bot",
+          "decision": "prompt",
+          "score": 5,
+          "level": "medium",
+          "reasons": [
+            "GATE-LEVEL-MEDIUM"
+          ],
+          "cascade": false,
+          "target": null,
+          "seq": 0,
+          "ts_ms": 1700000000000,
+          "event": "decision",
+          "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+          "hash": "5aa6b2c49eee5103efc77ddd46e22b10c2e9c963d56a230330a7b603b78b3bae"
+        },
+        {
+          "action_id": "a1",
+          "status": "killed",
+          "first": true,
+          "reason": "arrêt «urgent» \n2",
+          "by": "operator",
+          "seq": 2,
+          "ts_ms": 1700000002000,
+          "event": "kill",
+          "prev": "69cb79c9ad7c7d8db39b7aee19903c048844d18336fb14b6305e48eda6115b7b",
+          "hash": "204b1b7f4dbf2df09d0093982694d31a71742712e703fb2c5125db3cfb1e6823"
+        }
+      ],
+      "bad_index": 0
+    },
+    {
+      "name": "record removed",
+      "records": [
+        {
+          "action_id": "a1",
+          "agent_id": "bot",
+          "decision": "prompt",
+          "score": 5,
+          "level": "medium",
+          "reasons": [
+            "GATE-LEVEL-MEDIUM"
+          ],
+          "cascade": false,
+          "target": null,
+          "seq": 0,
+          "ts_ms": 1700000000000,
+          "event": "decision",
+          "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+          "hash": "5aa6b2c49eee5103efc77ddd46e22b10c2e9c963d56a230330a7b603b78b3bae"
+        },
+        {
+          "action_id": "a1",
+          "status": "killed",
+          "first": true,
+          "reason": "arrêt «urgent» \n2",
+          "by": "operator",
+          "seq": 2,
+          "ts_ms": 1700000002000,
+          "event": "kill",
+          "prev": "69cb79c9ad7c7d8db39b7aee19903c048844d18336fb14b6305e48eda6115b7b",
+          "hash": "204b1b7f4dbf2df09d0093982694d31a71742712e703fb2c5125db3cfb1e6823"
+        }
+      ],
+      "bad_index": 1
+    },
+    {
+      "name": "hash replaced",
+      "records": [
+        {
+          "action_id": "a1",
+          "agent_id": "bot",
+          "decision": "prompt",
+          "score": 5,
+          "level": "medium",
+          "reasons": [
+            "GATE-LEVEL-MEDIUM"
+          ],
+          "cascade": false,
+          "target": null,
+          "seq": 0,
+          "ts_ms": 1700000000000,
+          "event": "decision",
+          "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+          "hash": "5aa6b2c49eee5103efc77ddd46e22b10c2e9c963d56a230330a7b603b78b3bae"
+        },
+        {
+          "approval_id": "ap1",
+          "action_id": "a1",
+          "outcome": "approved",
+          "by": "slack:U123",
+          "seq": 1,
+          "ts_ms": 1700000001000,
+          "event": "approval",
+          "prev": "5aa6b2c49eee5103efc77ddd46e22b10c2e9c963d56a230330a7b603b78b3bae",
+          "hash": "69cb79c9ad7c7d8db39b7aee19903c048844d18336fb14b6305e48eda6115b7b"
+        },
+        {
+          "action_id": "a1",
+          "status": "killed",
+          "first": true,
+          "reason": "arrêt «urgent» \n2",
+          "by": "operator",
+          "seq": 2,
+          "ts_ms": 1700000002000,
+          "event": "kill",
+          "prev": "69cb79c9ad7c7d8db39b7aee19903c048844d18336fb14b6305e48eda6115b7b",
+          "hash": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ],
+      "bad_index": 2
+    },
+    {
+      "name": "genesis prev changed",
+      "records": [
+        {
+          "action_id": "a1",
+          "agent_id": "bot",
+          "decision": "prompt",
+          "score": 5,
+          "level": "medium",
+          "reasons": [
+            "GATE-LEVEL-MEDIUM"
+          ],
+          "cascade": false,
+          "target": null,
+          "seq": 0,
+          "ts_ms": 1700000000000,
+          "event": "decision",
+          "prev": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "hash": "5aa6b2c49eee5103efc77ddd46e22b10c2e9c963d56a230330a7b603b78b3bae"
+        },
+        {
+          "approval_id": "ap1",
+          "action_id": "a1",
+          "outcome": "approved",
+          "by": "slack:U123",
+          "seq": 1,
+          "ts_ms": 1700000001000,
+          "event": "approval",
+          "prev": "5aa6b2c49eee5103efc77ddd46e22b10c2e9c963d56a230330a7b603b78b3bae",
+          "hash": "69cb79c9ad7c7d8db39b7aee19903c048844d18336fb14b6305e48eda6115b7b"
+        },
+        {
+          "action_id": "a1",
+          "status": "killed",
+          "first": true,
+          "reason": "arrêt «urgent» \n2",
+          "by": "operator",
+          "seq": 2,
+          "ts_ms": 1700000002000,
+          "event": "kill",
+          "prev": "69cb79c9ad7c7d8db39b7aee19903c048844d18336fb14b6305e48eda6115b7b",
+          "hash": "204b1b7f4dbf2df09d0093982694d31a71742712e703fb2c5125db3cfb1e6823"
+        }
+      ],
+      "bad_index": 0
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "schema": "smartgate.policy/v1",
+  "cost_bands": [
+    {
+      "max_usd": 1000,
+      "score": 2
+    },
+    {
+      "max_usd": 5000,
+      "score": 5
+    },
+    {
+      "max_usd": 20000,
+      "score": 8
+    },
+    {
+      "max_usd": null,
+      "score": 10
+    }
+  ],
+  "action_floors": {
+    "read": 0,
+    "api_call": 0,
+    "file_write": 2,
+    "message_send": 3,
+    "db_write": 3,
+    "code_exec": 6,
+    "delete": 6
+  },
+  "default_floor": 4,
+  "irreversible_bonus": 2,
+  "levels": [
+    {
+      "name": "low",
+      "max_score": 3,
+      "friction": "allow"
+    },
+    {
+      "name": "medium",
+      "max_score": 6,
+      "friction": "prompt"
+    },
+    {
+      "name": "high",
+      "max_score": 10,
+      "friction": "block"
+    }
+  ],
+  "cascade": {
+    "window_ms": 5000,
+    "max_actions": 3,
+    "max_cumulative_risk": 7,
+    "escalate_to": "allow"
+  },
+  "low_confidence": {
+    "below_permille": 300,
+    "escalate_to": "prompt"
+  },
+  "approval": {
+    "timeout_ms": 300000,
+    "on_timeout": "reject"
+  },
+  "fallback": "allow"
+}

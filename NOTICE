@@ -1,0 +1,20 @@
+SmartGate
+Copyright 2026 SmartTasks Lab
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Names and affiliation
+---------------------
+
+SmartGate is published by SmartTasksOrg. The only package names it is
+published under are those marked "registered": true in names.json.
+
+Slack is a trademark of its owner.
+Prometheus is a trademark of its owner.
+Grafana is a trademark of its owner.
+Redis is a trademark of its owner.
+k6 is a trademark of its owner.
+LangChain is a trademark of its owner.
+All other names are the property of their respective owners. Their use here
+only says what the software connects to or works with; it does not imply
+affiliation, sponsorship or endorsement.
